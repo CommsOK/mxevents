@@ -134,45 +134,355 @@ const (
 )
 
 // ====================================
-// Bounce/Failure Reasons (Subtypes)
+// Bounce / Failure Reasons (Sisimai-derived)
 // ====================================
 //
-// These reasons provide additional context for bounce events, indicating
-// the specific cause of delivery failure or rejection.
-
+// These Reason values are produced by the Sisimai library based on SMTP reply
+// codes, enhanced status codes (when present), and diagnostic message parsing.
+//
+// Important constraints:
+//
+//   - Reasons describe *why* a delivery attempt failed, as inferred from the
+//     remote server's response. They do NOT reliably indicate who is "at fault"
+//     (sender vs recipient) on their own.
+//   - Temporary vs permanent is determined primarily via Sisimai's hardbounce
+//     signal (or SMTP 4xx vs 5xx when available), not by the reason name itself.
+//   - Sender/recipient attribution may be inferred later using additional logic,
+//     but is not guaranteed by the reason alone.
+//
+// These docs describe ONLY what Sisimai (and therefore CommsOK) can realistically
+// detect from bounce data, not all theoretical causes.
+//
+// Source: https://libsisimai.org/en/reason/
 const (
-	ReasonAuthFailure     Reason = "AuthFailure"
-	ReasonBadReputation   Reason = "BadReputation"
-	ReasonBlocked         Reason = "Blocked"
-	ReasonContentError    Reason = "ContentError"
-	ReasonDelivered       Reason = "Delivered"
-	ReasonEmailTooLarge   Reason = "EmailTooLarge"
-	ReasonExpired         Reason = "Expired"
-	ReasonFailedSTARTTLS  Reason = "FailedSTARTTLS"
-	ReasonFeedback        Reason = "Feedback"
-	ReasonFiltered        Reason = "Filtered"
-	ReasonHasMoved        Reason = "HasMoved"
-	ReasonHostUnknown     Reason = "HostUnknown"
-	ReasonMailboxFull     Reason = "MailboxFull"
-	ReasonMailerError     Reason = "MailerError"
-	ReasonNetworkError    Reason = "NetworkError"
-	ReasonNoRelaying      Reason = "NoRelaying"
-	ReasonNotAccept       Reason = "NotAccept"
-	ReasonNotCompliantRFC Reason = "NotCompliantRFC"
-	ReasonOnHold          Reason = "OnHold"
+
+	// ReasonUserUnknown indicates the remote server reported that the recipient
+	// mailbox does not exist or is not recognized.
+	//
+	// Detectable signals:
+	// - SMTP replies like 550 5.1.1
+	// - Diagnostic messages containing "user unknown", "no such user", etc.
+	//
+	// Reliable inferences:
+	// - Permanent failure (hardbounce = true)
+	// - Recipient address is invalid
+	ReasonUserUnknown Reason = "UserUnknown"
+
+	// ReasonHostUnknown indicates the recipient domain or mail host could not be resolved.
+	//
+	// Detectable signals:
+	// - DNS lookup failures
+	// - SMTP diagnostics like "host not found", "domain does not exist"
+	//
+	// Reliable inferences:
+	// - Often permanent, sometimes temporary (depends on DNS failure type)
+	// - Recipient domain problem
+	ReasonHostUnknown Reason = "HostUnknown"
+
+	// ReasonHasMoved indicates the recipient address is no longer valid and has
+	// been replaced or moved elsewhere.
+	//
+	// Detectable signals:
+	// - SMTP replies referencing address relocation or forwarding-only status
+	//
+	// Reliable inferences:
+	// - Permanent failure
+	// - Recipient-side condition
+	ReasonHasMoved Reason = "HasMoved"
+
+	// ReasonMailboxFull indicates the recipient mailbox is over quota.
+	//
+	// Detectable signals:
+	// - SMTP replies like 452 4.2.2 or equivalent wording
+	//
+	// Reliable inferences:
+	// - Usually temporary (softbounce)
+	// - Recipient-side capacity issue
+	ReasonMailboxFull Reason = "MailboxFull"
+
+	// ReasonVacation indicates the recipient is in an auto-reply / vacation state
+	// and delivery may be deferred.
+	//
+	// Detectable signals:
+	// - Auto-responder wording in SMTP diagnostics
+	//
+	// Reliable inferences:
+	// - Temporary failure
+	// - No delivery rejection semantics by itself
+	ReasonVacation Reason = "Vacation"
+
+	// ReasonSpamDetected indicates the remote server classified the message as spam
+	// or bulk unsolicited content.
+	//
+	// Detectable signals:
+	// - SMTP replies referencing spam, bulk mail, content scoring
+	//
+	// Reliable inferences:
+	// - Failure may be temporary or permanent
+	// - Content/reputation related rejection
+	// - Does NOT reliably prove sender-wide vs recipient-specific scope
+	ReasonSpamDetected Reason = "SpamDetected"
+
+	// ReasonBadReputation indicates rejection due to sender reputation signals.
+	//
+	// Detectable signals:
+	// - Diagnostics mentioning reputation, history, or policy trust
+	//
+	// Reliable inferences:
+	// - Failure may be temporary or permanent
+	// - Reputation-based rejection
+	ReasonBadReputation Reason = "BadReputation"
+
+	// ReasonBlocked indicates the message was blocked by a rule or deny list.
+	//
+	// Detectable signals:
+	// - SMTP replies containing "blocked", "denied", "refused"
+	//
+	// Reliable inferences:
+	// - Failure may be temporary or permanent
+	// - Policy-based rejection, scope unclear
+	ReasonBlocked Reason = "Blocked"
+
+	// ReasonPolicyViolation indicates rejection due to policy enforcement other
+	// than spam classification.
+	//
+	// Detectable signals:
+	// - Diagnostics referencing policy rules or restrictions
+	//
+	// Reliable inferences:
+	// - Failure may be temporary or permanent
+	// - Policy-based rejection
 	ReasonPolicyViolation Reason = "PolicyViolation"
-	ReasonRateLimited     Reason = "RateLimited"
-	ReasonRejected        Reason = "Rejected"
-	ReasonRequirePTR      Reason = "RequirePTR"
-	ReasonSecurityError   Reason = "SecurityError"
-	ReasonSpamDetected    Reason = "SpamDetected"
-	ReasonSuppressed      Reason = "Suppressed"
-	ReasonSuspend         Reason = "Suspend"
-	ReasonSyntaxError     Reason = "SyntaxError"
-	ReasonSystemError     Reason = "SystemError"
-	ReasonSystemFull      Reason = "SystemFull"
-	ReasonUndefined       Reason = "Undefined"
-	ReasonUserUnknown     Reason = "UserUnknown"
-	ReasonVacation        Reason = "Vacation"
-	ReasonVirusDetected   Reason = "VirusDetected"
+
+	// ReasonAuthFailure indicates authentication-related rejection.
+	//
+	// Detectable signals:
+	// - SMTP replies mentioning SPF, DKIM, DMARC, AUTH, or credentials
+	//
+	// Reliable inferences:
+	// - Failure may be temporary or permanent
+	// - Authentication-related rejection
+	ReasonAuthFailure Reason = "AuthFailure"
+
+	// ReasonRequirePTR indicates rejection due to missing or invalid reverse DNS.
+	//
+	// Detectable signals:
+	// - Diagnostics referencing PTR or reverse DNS
+	//
+	// Reliable inferences:
+	// - Permanent failure
+	// - Infrastructure misconfiguration
+	ReasonRequirePTR Reason = "RequirePTR"
+
+	// ReasonFailedSTARTTLS indicates TLS negotiation failure.
+	//
+	// Detectable signals:
+	// - STARTTLS failure messages
+	// - TLS handshake or certificate errors
+	//
+	// Reliable inferences:
+	// - Temporary or permanent failure
+	// - Transport security failure
+	ReasonFailedSTARTTLS Reason = "FailedSTARTTLS"
+
+	// ReasonEmailTooLarge indicates the message exceeded size limits.
+	//
+	// Detectable signals:
+	// - SMTP replies like 552 5.3.4
+	//
+	// Reliable inferences:
+	// - Usually permanent
+	// - Message size violation
+	ReasonEmailTooLarge Reason = "EmailTooLarge"
+
+	// ReasonVirusDetected indicates malware or virus detection.
+	//
+	// Detectable signals:
+	// - Diagnostics mentioning virus, malware, or infected content
+	//
+	// Reliable inferences:
+	// - Permanent failure
+	// - Content security rejection
+	ReasonVirusDetected Reason = "VirusDetected"
+
+	// ReasonContentError indicates malformed message content.
+	//
+	// Detectable signals:
+	// - Invalid MIME structure
+	// - Header parsing errors
+	//
+	// Reliable inferences:
+	// - Usually permanent
+	// - Message construction error
+	ReasonContentError Reason = "ContentError"
+
+	// ReasonNotCompliantRFC indicates protocol or RFC violations.
+	//
+	// Detectable signals:
+	// - Invalid SMTP commands, malformed headers, bad addresses
+	//
+	// Reliable inferences:
+	// - Usually permanent
+	// - Protocol-level non-compliance
+	ReasonNotCompliantRFC Reason = "NotCompliantRFC"
+
+	// ReasonSyntaxError indicates syntax errors in SMTP dialogue or addresses.
+	//
+	// Detectable signals:
+	// - SMTP syntax error responses
+	//
+	// Reliable inferences:
+	// - Temporary or permanent
+	// - Protocol syntax issue
+	ReasonSyntaxError Reason = "SyntaxError"
+
+	// ReasonNoRelaying indicates the remote server refused to relay the message.
+	//
+	// Detectable signals:
+	// - "Relaying denied" diagnostics
+	//
+	// Reliable inferences:
+	// - Permanent failure
+	// - Relay policy rejection
+	ReasonNoRelaying Reason = "NoRelaying"
+
+	// ReasonRateLimited indicates throttling or rate enforcement.
+	//
+	// Detectable signals:
+	// - SMTP replies like 421 or diagnostics mentioning rate limits
+	//
+	// Reliable inferences:
+	// - Temporary failure
+	// - Volume or concurrency throttling
+	ReasonRateLimited Reason = "RateLimited"
+
+	// ReasonSystemFull indicates remote system capacity exhaustion.
+	//
+	// Detectable signals:
+	// - Queue full, disk full diagnostics
+	//
+	// Reliable inferences:
+	// - Usually temporary
+	// - Remote system capacity issue
+	ReasonSystemFull Reason = "SystemFull"
+
+	// ReasonSystemError indicates a generic remote system error.
+	//
+	// Detectable signals:
+	// - Non-specific "system error" responses
+	//
+	// Reliable inferences:
+	// - Usually temporary
+	// - Infrastructure-level failure
+	ReasonSystemError Reason = "SystemError"
+
+	// ReasonNetworkError indicates connectivity or routing failures.
+	//
+	// Detectable signals:
+	// - Connection timeouts
+	// - TCP/IP errors
+	//
+	// Reliable inferences:
+	// - Temporary failure
+	// - Network-layer issue
+	ReasonNetworkError Reason = "NetworkError"
+
+	// ReasonExpired indicates delivery attempts were retried and eventually abandoned.
+	//
+	// Detectable signals:
+	// - Explicit "expired" or retry timeout indicators from the MTA
+	//
+	// Reliable inferences:
+	// - Final failure after temporary retries
+	ReasonExpired Reason = "Expired"
+
+	// ReasonFiltered indicates the message was filtered without explicit spam classification.
+	//
+	// Detectable signals:
+	// - Diagnostics mentioning filtering or moderation
+	//
+	// Reliable inferences:
+	// - Temporary or permanent
+	// - Filtering decision, exact cause unclear
+	ReasonFiltered Reason = "Filtered"
+
+	// ReasonRejected indicates a generic rejection without detailed classification.
+	//
+	// Detectable signals:
+	// - "Rejected" diagnostics with no additional context
+	//
+	// Reliable inferences:
+	// - Failure occurred
+	// - Cause unknown
+	ReasonRejected Reason = "Rejected"
+
+	// ReasonNotAccept indicates refusal to accept the message.
+	//
+	// Detectable signals:
+	// - "Not accepted" diagnostics
+	//
+	// Reliable inferences:
+	// - Failure occurred
+	// - Cause unclear
+	ReasonNotAccept Reason = "NotAccept"
+
+	// ReasonMailerError indicates a generic mailer failure.
+	//
+	// Detectable signals:
+	// - Mail system error messages without detail
+	//
+	// Reliable inferences:
+	// - Failure occurred
+	// - Classification uncertain
+	ReasonMailerError Reason = "MailerError"
+
+	// ReasonSecurityError indicates rejection due to security controls.
+	//
+	// Detectable signals:
+	// - Diagnostics mentioning security, abuse, or protection mechanisms
+	//
+	// Reliable inferences:
+	// - Temporary or permanent
+	// - Security-related rejection
+	ReasonSecurityError Reason = "SecurityError"
+
+	// ReasonSuspend indicates the sender or recipient account is suspended.
+	//
+	// Detectable signals:
+	// - Account disabled or suspended diagnostics
+	//
+	// Reliable inferences:
+	// - Usually permanent
+	// - Account-level restriction
+	ReasonSuspend Reason = "Suspend"
+
+	// ReasonFeedback indicates enforcement based on feedback loop data.
+	//
+	// Detectable signals:
+	// - ESP-side suppression tied to complaints
+	//
+	// Reliable inferences:
+	// - Not an SMTP bounce
+	// - Pre-delivery suppression
+	ReasonFeedback Reason = "Feedback"
+
+	// ReasonSuppressed indicates the message was suppressed before delivery attempt.
+	//
+	// Detectable signals:
+	// - ESP or platform reports suppression without SMTP attempt
+	//
+	// Reliable inferences:
+	// - Not an SMTP bounce
+	// - Intentional non-delivery
+	ReasonSuppressed Reason = "Suppressed"
+
+	// ReasonUndefined indicates the reason could not be determined.
+	//
+	// Detectable signals:
+	// - Missing or unparsable diagnostics
+	//
+	// Reliable inferences:
+	// - Failure occurred
+	// - No further classification possible
+	ReasonUndefined Reason = "Undefined"
 )
