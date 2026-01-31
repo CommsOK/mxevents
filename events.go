@@ -5,6 +5,10 @@ package mxevents
 // Event represents a canonical email event type.
 type Event string
 
+// Reason represents a bounce/failure reason subtype providing additional
+// context for why a delivery failed or was rejected.
+type Reason string
+
 const (
 	// ====================================
 	// Origin Platform (CRM / Vendor's Comms Layer)
@@ -127,4 +131,48 @@ const (
 	// manually cleared (e.g., by operator review, recipient request, or automated
 	// rehabilitation). This allows the recipient to receive emails again.
 	EventStatusSpamCleared Event = "status-spam-cleared"
+)
+
+// ====================================
+// Bounce/Failure Reasons (Subtypes)
+// ====================================
+//
+// These reasons provide additional context for bounce events, indicating
+// the specific cause of delivery failure or rejection.
+
+const (
+	ReasonAuthFailure     Reason = "AuthFailure"
+	ReasonBadReputation   Reason = "BadReputation"
+	ReasonBlocked         Reason = "Blocked"
+	ReasonContentError    Reason = "ContentError"
+	ReasonDelivered       Reason = "Delivered"
+	ReasonEmailTooLarge   Reason = "EmailTooLarge"
+	ReasonExpired         Reason = "Expired"
+	ReasonFailedSTARTTLS  Reason = "FailedSTARTTLS"
+	ReasonFeedback        Reason = "Feedback"
+	ReasonFiltered        Reason = "Filtered"
+	ReasonHasMoved        Reason = "HasMoved"
+	ReasonHostUnknown     Reason = "HostUnknown"
+	ReasonMailboxFull     Reason = "MailboxFull"
+	ReasonMailerError     Reason = "MailerError"
+	ReasonNetworkError    Reason = "NetworkError"
+	ReasonNoRelaying      Reason = "NoRelaying"
+	ReasonNotAccept       Reason = "NotAccept"
+	ReasonNotCompliantRFC Reason = "NotCompliantRFC"
+	ReasonOnHold          Reason = "OnHold"
+	ReasonPolicyViolation Reason = "PolicyViolation"
+	ReasonRateLimited     Reason = "RateLimited"
+	ReasonRejected        Reason = "Rejected"
+	ReasonRequirePTR      Reason = "RequirePTR"
+	ReasonSecurityError   Reason = "SecurityError"
+	ReasonSpamDetected    Reason = "SpamDetected"
+	ReasonSuppressed      Reason = "Suppressed"
+	ReasonSuspend         Reason = "Suspend"
+	ReasonSyntaxError     Reason = "SyntaxError"
+	ReasonSystemError     Reason = "SystemError"
+	ReasonSystemFull      Reason = "SystemFull"
+	ReasonUndefined       Reason = "Undefined"
+	ReasonUserUnknown     Reason = "UserUnknown"
+	ReasonVacation        Reason = "Vacation"
+	ReasonVirusDetected   Reason = "VirusDetected"
 )
