@@ -156,7 +156,7 @@ const (
 // Source: https://libsisimai.org/en/reason/
 const (
 
-	// ReasonUserUnknown indicates the remote server reported that the recipient
+	// BounceReasonUserUnknown indicates the remote server reported that the recipient
 	// mailbox does not exist or is not recognized.
 	//
 	// Detectable signals:
@@ -166,9 +166,9 @@ const (
 	// Reliable inferences:
 	// - Permanent failure (hardbounce = true)
 	// - Recipient address is invalid
-	ReasonUserUnknown Reason = "UserUnknown"
+	BounceReasonUserUnknown Reason = "UserUnknown"
 
-	// ReasonHostUnknown indicates the recipient domain or mail host could not be resolved.
+	// BounceReasonHostUnknown indicates the recipient domain or mail host could not be resolved.
 	//
 	// Detectable signals:
 	// - DNS lookup failures
@@ -177,9 +177,9 @@ const (
 	// Reliable inferences:
 	// - Often permanent, sometimes temporary (depends on DNS failure type)
 	// - Recipient domain problem
-	ReasonHostUnknown Reason = "HostUnknown"
+	BounceReasonHostUnknown Reason = "HostUnknown"
 
-	// ReasonHasMoved indicates the recipient address is no longer valid and has
+	// BounceReasonHasMoved indicates the recipient address is no longer valid and has
 	// been replaced or moved elsewhere.
 	//
 	// Detectable signals:
@@ -188,9 +188,9 @@ const (
 	// Reliable inferences:
 	// - Permanent failure
 	// - Recipient-side condition
-	ReasonHasMoved Reason = "HasMoved"
+	BounceReasonHasMoved Reason = "HasMoved"
 
-	// ReasonMailboxFull indicates the recipient mailbox is over quota.
+	// BounceReasonMailboxFull indicates the recipient mailbox is over quota.
 	//
 	// Detectable signals:
 	// - SMTP replies like 452 4.2.2 or equivalent wording
@@ -198,9 +198,9 @@ const (
 	// Reliable inferences:
 	// - Usually temporary (softbounce)
 	// - Recipient-side capacity issue
-	ReasonMailboxFull Reason = "MailboxFull"
+	BounceReasonMailboxFull Reason = "MailboxFull"
 
-	// ReasonVacation indicates the recipient is in an auto-reply / vacation state
+	// BounceReasonVacation indicates the recipient is in an auto-reply / vacation state
 	// and delivery may be deferred.
 	//
 	// Detectable signals:
@@ -209,9 +209,9 @@ const (
 	// Reliable inferences:
 	// - Temporary failure
 	// - No delivery rejection semantics by itself
-	ReasonVacation Reason = "Vacation"
+	BounceReasonVacation Reason = "Vacation"
 
-	// ReasonSpamDetected indicates the remote server classified the message as spam
+	// BounceReasonSpamDetected indicates the remote server classified the message as spam
 	// or bulk unsolicited content.
 	//
 	// Detectable signals:
@@ -221,9 +221,9 @@ const (
 	// - Failure may be temporary or permanent
 	// - Content/reputation related rejection
 	// - Does NOT reliably prove sender-wide vs recipient-specific scope
-	ReasonSpamDetected Reason = "SpamDetected"
+	BounceReasonSpamDetected Reason = "SpamDetected"
 
-	// ReasonBadReputation indicates rejection due to sender reputation signals.
+	// BounceReasonBadReputation indicates rejection due to sender reputation signals.
 	//
 	// Detectable signals:
 	// - Diagnostics mentioning reputation, history, or policy trust
@@ -231,9 +231,9 @@ const (
 	// Reliable inferences:
 	// - Failure may be temporary or permanent
 	// - Reputation-based rejection
-	ReasonBadReputation Reason = "BadReputation"
+	BounceReasonBadReputation Reason = "BadReputation"
 
-	// ReasonBlocked indicates the message was blocked by a rule or deny list.
+	// BounceReasonBlocked indicates the message was blocked by a rule or deny list.
 	//
 	// Detectable signals:
 	// - SMTP replies containing "blocked", "denied", "refused"
@@ -241,9 +241,9 @@ const (
 	// Reliable inferences:
 	// - Failure may be temporary or permanent
 	// - Policy-based rejection, scope unclear
-	ReasonBlocked Reason = "Blocked"
+	BounceReasonBlocked Reason = "Blocked"
 
-	// ReasonPolicyViolation indicates rejection due to policy enforcement other
+	// BounceReasonPolicyViolation indicates rejection due to policy enforcement other
 	// than spam classification.
 	//
 	// Detectable signals:
@@ -252,9 +252,9 @@ const (
 	// Reliable inferences:
 	// - Failure may be temporary or permanent
 	// - Policy-based rejection
-	ReasonPolicyViolation Reason = "PolicyViolation"
+	BounceReasonPolicyViolation Reason = "PolicyViolation"
 
-	// ReasonAuthFailure indicates authentication-related rejection.
+	// BounceReasonAuthFailure indicates authentication-related rejection.
 	//
 	// Detectable signals:
 	// - SMTP replies mentioning SPF, DKIM, DMARC, AUTH, or credentials
@@ -262,9 +262,9 @@ const (
 	// Reliable inferences:
 	// - Failure may be temporary or permanent
 	// - Authentication-related rejection
-	ReasonAuthFailure Reason = "AuthFailure"
+	BounceReasonAuthFailure Reason = "AuthFailure"
 
-	// ReasonRequirePTR indicates rejection due to missing or invalid reverse DNS.
+	// BounceReasonRequirePTR indicates rejection due to missing or invalid reverse DNS.
 	//
 	// Detectable signals:
 	// - Diagnostics referencing PTR or reverse DNS
@@ -272,9 +272,9 @@ const (
 	// Reliable inferences:
 	// - Permanent failure
 	// - Infrastructure misconfiguration
-	ReasonRequirePTR Reason = "RequirePTR"
+	BounceReasonRequirePTR Reason = "RequirePTR"
 
-	// ReasonFailedSTARTTLS indicates TLS negotiation failure.
+	// BounceReasonFailedSTARTTLS indicates TLS negotiation failure.
 	//
 	// Detectable signals:
 	// - STARTTLS failure messages
@@ -283,9 +283,9 @@ const (
 	// Reliable inferences:
 	// - Temporary or permanent failure
 	// - Transport security failure
-	ReasonFailedSTARTTLS Reason = "FailedSTARTTLS"
+	BounceReasonFailedSTARTTLS Reason = "FailedSTARTTLS"
 
-	// ReasonEmailTooLarge indicates the message exceeded size limits.
+	// BounceReasonEmailTooLarge indicates the message exceeded size limits.
 	//
 	// Detectable signals:
 	// - SMTP replies like 552 5.3.4
@@ -293,9 +293,9 @@ const (
 	// Reliable inferences:
 	// - Usually permanent
 	// - Message size violation
-	ReasonEmailTooLarge Reason = "EmailTooLarge"
+	BounceReasonEmailTooLarge Reason = "EmailTooLarge"
 
-	// ReasonVirusDetected indicates malware or virus detection.
+	// BounceReasonVirusDetected indicates malware or virus detection.
 	//
 	// Detectable signals:
 	// - Diagnostics mentioning virus, malware, or infected content
@@ -303,9 +303,9 @@ const (
 	// Reliable inferences:
 	// - Permanent failure
 	// - Content security rejection
-	ReasonVirusDetected Reason = "VirusDetected"
+	BounceReasonVirusDetected Reason = "VirusDetected"
 
-	// ReasonContentError indicates malformed message content.
+	// BounceReasonContentError indicates malformed message content.
 	//
 	// Detectable signals:
 	// - Invalid MIME structure
@@ -314,9 +314,9 @@ const (
 	// Reliable inferences:
 	// - Usually permanent
 	// - Message construction error
-	ReasonContentError Reason = "ContentError"
+	BounceReasonContentError Reason = "ContentError"
 
-	// ReasonNotCompliantRFC indicates protocol or RFC violations.
+	// BounceReasonNotCompliantRFC indicates protocol or RFC violations.
 	//
 	// Detectable signals:
 	// - Invalid SMTP commands, malformed headers, bad addresses
@@ -324,9 +324,9 @@ const (
 	// Reliable inferences:
 	// - Usually permanent
 	// - Protocol-level non-compliance
-	ReasonNotCompliantRFC Reason = "NotCompliantRFC"
+	BounceReasonNotCompliantRFC Reason = "NotCompliantRFC"
 
-	// ReasonSyntaxError indicates syntax errors in SMTP dialogue or addresses.
+	// BounceReasonSyntaxError indicates syntax errors in SMTP dialogue or addresses.
 	//
 	// Detectable signals:
 	// - SMTP syntax error responses
@@ -334,9 +334,9 @@ const (
 	// Reliable inferences:
 	// - Temporary or permanent
 	// - Protocol syntax issue
-	ReasonSyntaxError Reason = "SyntaxError"
+	BounceReasonSyntaxError Reason = "SyntaxError"
 
-	// ReasonNoRelaying indicates the remote server refused to relay the message.
+	// BounceReasonNoRelaying indicates the remote server refused to relay the message.
 	//
 	// Detectable signals:
 	// - "Relaying denied" diagnostics
@@ -344,9 +344,9 @@ const (
 	// Reliable inferences:
 	// - Permanent failure
 	// - Relay policy rejection
-	ReasonNoRelaying Reason = "NoRelaying"
+	BounceReasonNoRelaying Reason = "NoRelaying"
 
-	// ReasonRateLimited indicates throttling or rate enforcement.
+	// BounceReasonRateLimited indicates throttling or rate enforcement.
 	//
 	// Detectable signals:
 	// - SMTP replies like 421 or diagnostics mentioning rate limits
@@ -354,9 +354,9 @@ const (
 	// Reliable inferences:
 	// - Temporary failure
 	// - Volume or concurrency throttling
-	ReasonRateLimited Reason = "RateLimited"
+	BounceReasonRateLimited Reason = "RateLimited"
 
-	// ReasonSystemFull indicates remote system capacity exhaustion.
+	// BounceReasonSystemFull indicates remote system capacity exhaustion.
 	//
 	// Detectable signals:
 	// - Queue full, disk full diagnostics
@@ -364,9 +364,9 @@ const (
 	// Reliable inferences:
 	// - Usually temporary
 	// - Remote system capacity issue
-	ReasonSystemFull Reason = "SystemFull"
+	BounceReasonSystemFull Reason = "SystemFull"
 
-	// ReasonSystemError indicates a generic remote system error.
+	// BounceReasonSystemError indicates a generic remote system error.
 	//
 	// Detectable signals:
 	// - Non-specific "system error" responses
@@ -374,9 +374,9 @@ const (
 	// Reliable inferences:
 	// - Usually temporary
 	// - Infrastructure-level failure
-	ReasonSystemError Reason = "SystemError"
+	BounceReasonSystemError Reason = "SystemError"
 
-	// ReasonNetworkError indicates connectivity or routing failures.
+	// BounceReasonNetworkError indicates connectivity or routing failures.
 	//
 	// Detectable signals:
 	// - Connection timeouts
@@ -385,18 +385,18 @@ const (
 	// Reliable inferences:
 	// - Temporary failure
 	// - Network-layer issue
-	ReasonNetworkError Reason = "NetworkError"
+	BounceReasonNetworkError Reason = "NetworkError"
 
-	// ReasonExpired indicates delivery attempts were retried and eventually abandoned.
+	// BounceReasonExpired indicates delivery attempts were retried and eventually abandoned.
 	//
 	// Detectable signals:
 	// - Explicit "expired" or retry timeout indicators from the MTA
 	//
 	// Reliable inferences:
 	// - Final failure after temporary retries
-	ReasonExpired Reason = "Expired"
+	BounceReasonExpired Reason = "Expired"
 
-	// ReasonFiltered indicates the message was filtered without explicit spam classification.
+	// BounceReasonFiltered indicates the message was filtered without explicit spam classification.
 	//
 	// Detectable signals:
 	// - Diagnostics mentioning filtering or moderation
@@ -404,9 +404,9 @@ const (
 	// Reliable inferences:
 	// - Temporary or permanent
 	// - Filtering decision, exact cause unclear
-	ReasonFiltered Reason = "Filtered"
+	BounceReasonFiltered Reason = "Filtered"
 
-	// ReasonRejected indicates a generic rejection without detailed classification.
+	// BounceReasonRejected indicates a generic rejection without detailed classification.
 	//
 	// Detectable signals:
 	// - "Rejected" diagnostics with no additional context
@@ -414,9 +414,9 @@ const (
 	// Reliable inferences:
 	// - Failure occurred
 	// - Cause unknown
-	ReasonRejected Reason = "Rejected"
+	BounceReasonRejected Reason = "Rejected"
 
-	// ReasonNotAccept indicates refusal to accept the message.
+	// BounceReasonNotAccept indicates refusal to accept the message.
 	//
 	// Detectable signals:
 	// - "Not accepted" diagnostics
@@ -424,9 +424,9 @@ const (
 	// Reliable inferences:
 	// - Failure occurred
 	// - Cause unclear
-	ReasonNotAccept Reason = "NotAccept"
+	BounceReasonNotAccept Reason = "NotAccept"
 
-	// ReasonMailerError indicates a generic mailer failure.
+	// BounceReasonMailerError indicates a generic mailer failure.
 	//
 	// Detectable signals:
 	// - Mail system error messages without detail
@@ -434,9 +434,9 @@ const (
 	// Reliable inferences:
 	// - Failure occurred
 	// - Classification uncertain
-	ReasonMailerError Reason = "MailerError"
+	BounceReasonMailerError Reason = "MailerError"
 
-	// ReasonSecurityError indicates rejection due to security controls.
+	// BounceReasonSecurityError indicates rejection due to security controls.
 	//
 	// Detectable signals:
 	// - Diagnostics mentioning security, abuse, or protection mechanisms
@@ -444,9 +444,9 @@ const (
 	// Reliable inferences:
 	// - Temporary or permanent
 	// - Security-related rejection
-	ReasonSecurityError Reason = "SecurityError"
+	BounceReasonSecurityError Reason = "SecurityError"
 
-	// ReasonSuspend indicates the sender or recipient account is suspended.
+	// BounceReasonSuspend indicates the sender or recipient account is suspended.
 	//
 	// Detectable signals:
 	// - Account disabled or suspended diagnostics
@@ -454,9 +454,9 @@ const (
 	// Reliable inferences:
 	// - Usually permanent
 	// - Account-level restriction
-	ReasonSuspend Reason = "Suspend"
+	BounceReasonSuspend Reason = "Suspend"
 
-	// ReasonFeedback indicates enforcement based on feedback loop data.
+	// BounceReasonFeedback indicates enforcement based on feedback loop data.
 	//
 	// Detectable signals:
 	// - ESP-side suppression tied to complaints
@@ -464,9 +464,9 @@ const (
 	// Reliable inferences:
 	// - Not an SMTP bounce
 	// - Pre-delivery suppression
-	ReasonFeedback Reason = "Feedback"
+	BounceReasonFeedback Reason = "Feedback"
 
-	// ReasonSuppressed indicates the message was suppressed before delivery attempt.
+	// BounceReasonSuppressed indicates the message was suppressed before delivery attempt.
 	//
 	// Detectable signals:
 	// - ESP or platform reports suppression without SMTP attempt
@@ -474,9 +474,9 @@ const (
 	// Reliable inferences:
 	// - Not an SMTP bounce
 	// - Intentional non-delivery
-	ReasonSuppressed Reason = "Suppressed"
+	BounceReasonSuppressed Reason = "Suppressed"
 
-	// ReasonUndefined indicates the reason could not be determined.
+	// BounceReasonUndefined indicates the reason could not be determined.
 	//
 	// Detectable signals:
 	// - Missing or unparsable diagnostics
@@ -484,7 +484,7 @@ const (
 	// Reliable inferences:
 	// - Failure occurred
 	// - No further classification possible
-	ReasonUndefined Reason = "Undefined"
+	BounceReasonUndefined Reason = "Undefined"
 )
 
 // ====================================
