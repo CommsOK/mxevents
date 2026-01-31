@@ -495,7 +495,7 @@ const (
 // by the originating platform or delivery gateway.
 //
 // They are NOT SMTP bounces and must never be treated as mailbox failures.
-type DropReason string
+type DropReason Reason
 
 const (
 	// DropReasonSuppressed indicates the message was suppressed due to an
@@ -550,7 +550,7 @@ const (
 // ====================================
 // Unsubscribe Reasons
 // ====================================
-type UnsubscribeReason string
+type UnsubscribeReason Reason
 
 const (
 	// UnsubscribeReasonUserInitiated indicates the recipient explicitly
@@ -588,7 +588,7 @@ const (
 // ====================================
 // Spam Report Reasons
 // ====================================
-type SpamReportReason string
+type SpamReportReason Reason
 
 const (
 	// SpamReportReasonFeedbackLoop indicates ISP feedback loop report.
@@ -618,7 +618,7 @@ const (
 // ====================================
 // Failure Reasons (Non-SMTP, Operational)
 // ====================================
-type FailureReason string
+type FailureReason Reason
 
 const (
 	// FailureReasonConfiguration indicates invalid or missing setup.
