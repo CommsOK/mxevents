@@ -486,3 +486,165 @@ const (
 	// - No further classification possible
 	ReasonUndefined Reason = "Undefined"
 )
+
+// ====================================
+// Drop Reasons (Pre-SMTP, Intentional Non-Delivery)
+// ====================================
+//
+// These reasons explain why a message was intentionally not sent
+// by the originating platform or delivery gateway.
+//
+// They are NOT SMTP bounces and must never be treated as mailbox failures.
+type DropReason string
+
+const (
+	// DropReasonSuppressed indicates the message was suppressed due to an
+	// internal suppression list or prior decision.
+	//
+	// Actionability:
+	// - No new suppression
+	// - Confirms existing suppression enforcement
+	DropReasonSuppressed DropReason = "Suppressed"
+
+	// DropReasonPolicyViolation indicates the message violated platform
+	// or gateway policy (not recipient mailbox policy).
+	//
+	// Actionability:
+	// - Block sending until configuration or content changes
+	// - Escalate to operator
+	DropReasonPolicyViolation DropReason = "PolicyViolation"
+
+	// DropReasonRateLimited indicates the message was dropped due to
+	// rate, concurrency, or throughput limits.
+	//
+	// Actionability:
+	// - Retry later
+	// - No suppression
+	DropReasonRateLimited DropReason = "RateLimited"
+
+	// DropReasonFeedback indicates the message was dropped due to prior
+	// spam complaints or feedback loop enforcement.
+	//
+	// Actionability:
+	// - Global suppression
+	// - Compliance escalation
+	DropReasonFeedback DropReason = "Feedback"
+
+	// DropReasonSecurity indicates the message was dropped due to security
+	// concerns (account abuse, compromised credentials, etc.).
+	//
+	// Actionability:
+	// - Immediate stop
+	// - Manual review required
+	DropReasonSecurity DropReason = "Security"
+
+	// DropReasonConfiguration indicates the platform could not send the
+	// message due to missing or invalid configuration.
+	//
+	// Actionability:
+	// - Fix integration, auth, domain, or sender setup
+	// - No suppression
+	DropReasonConfiguration DropReason = "Configuration"
+)
+
+// ====================================
+// Unsubscribe Reasons
+// ====================================
+type UnsubscribeReason string
+
+const (
+	// UnsubscribeReasonUserInitiated indicates the recipient explicitly
+	// opted out (UI, link, reply).
+	//
+	// Actionability:
+	// - Permanent suppression
+	// - No rehabilitation
+	UnsubscribeReasonUserInitiated UnsubscribeReason = "UserInitiated"
+
+	// UnsubscribeReasonOneClick indicates RFC-compliant one-click unsubscribe.
+	//
+	// Actionability:
+	// - Permanent suppression
+	// - Compliance-grade signal
+	UnsubscribeReasonOneClick UnsubscribeReason = "OneClick"
+
+	// UnsubscribeReasonAdmin indicates an operator or admin unsubscribed
+	// the recipient.
+	//
+	// Actionability:
+	// - Suppression applies
+	// - Rehabilitation possible if reversed
+	UnsubscribeReasonAdmin UnsubscribeReason = "AdminAction"
+
+	// UnsubscribeReasonCompliance indicates automatic unsubscribe due to
+	// legal or regulatory enforcement.
+	//
+	// Actionability:
+	// - Permanent suppression
+	// - No override
+	UnsubscribeReasonCompliance UnsubscribeReason = "Compliance"
+)
+
+// ====================================
+// Spam Report Reasons
+// ====================================
+type SpamReportReason string
+
+const (
+	// SpamReportReasonFeedbackLoop indicates ISP feedback loop report.
+	//
+	// Actionability:
+	// - Immediate global suppression
+	// - Reputation impact
+	SpamReportReasonFeedbackLoop SpamReportReason = "FeedbackLoop"
+
+	// SpamReportReasonUserAction indicates the recipient explicitly
+	// marked the message as spam.
+	//
+	// Actionability:
+	// - Immediate suppression
+	// - High confidence signal
+	SpamReportReasonUserAction SpamReportReason = "UserAction"
+
+	// SpamReportReasonProviderHeuristic indicates the provider inferred
+	// spam reporting behavior without explicit user action.
+	//
+	// Actionability:
+	// - Suppression recommended
+	// - Lower confidence
+	SpamReportReasonProviderHeuristic SpamReportReason = "ProviderHeuristic"
+)
+
+// ====================================
+// Failure Reasons (Non-SMTP, Operational)
+// ====================================
+type FailureReason string
+
+const (
+	// FailureReasonConfiguration indicates invalid or missing setup.
+	//
+	// Actionability:
+	// - Fix integration or credentials
+	FailureReasonConfiguration FailureReason = "Configuration"
+
+	// FailureReasonAuth indicates authentication or authorization failure.
+	//
+	// Actionability:
+	// - Rotate credentials
+	// - Fix OAuth / API keys
+	FailureReasonAuth FailureReason = "Auth"
+
+	// FailureReasonSystem indicates internal platform or gateway failure.
+	//
+	// Actionability:
+	// - Retry
+	// - Monitor incident
+	FailureReasonSystem FailureReason = "System"
+
+	// FailureReasonTimeout indicates upstream or downstream timeout.
+	//
+	// Actionability:
+	// - Retry
+	// - No suppression
+	FailureReasonTimeout FailureReason = "Timeout"
+)
