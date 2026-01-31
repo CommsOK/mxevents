@@ -2,8 +2,8 @@
 // It serves as the source of truth for event types across the email delivery pipeline.
 package mxevents
 
-// Event represents a canonical email event type.
-type Event string
+// EventType represents a canonical email event type.
+type EventType string
 
 // Reason represents a bounce/failure reason subtype providing additional
 // context for why a delivery failed or was rejected.
@@ -17,16 +17,16 @@ const (
 	// EventOriginSuccess indicates the vendor's communications platform
 	// successfully accepted the message into its pipeline for processing.
 	// Example: HubSpot or Customer.io acknowledging a campaign email internally.
-	EventOriginSuccess Event = "origin-success"
+	EventOriginSuccess EventType = "origin-success"
 
 	// EventOriginFailed indicates the vendor's communications platform rejected
 	// the message before it reached the delivery vendor.
 	// Example: invalid payload, missing recipient, or template rendering error.
-	EventOriginFailed Event = "origin-failed"
+	EventOriginFailed EventType = "origin-failed"
 
 	// EventOriginDropped indicates the vendor's communications platform intentionally
 	// discarded the message (e.g., internal suppression, policy enforcement).
-	EventOriginDropped Event = "origin-dropped"
+	EventOriginDropped EventType = "origin-dropped"
 
 	// ====================================
 	// Gateway (ESP Layer)
@@ -35,19 +35,19 @@ const (
 	// EventGatewayAccepted indicates the delivery gateway (ESP) acknowledged the message
 	// and queued it for outbound delivery. This is the point where responsibility shifts
 	// to the ESP's infrastructure.
-	EventGatewayAccepted Event = "gateway-accepted"
+	EventGatewayAccepted EventType = "gateway-accepted"
 
 	// EventGatewaySuccess indicates the delivery gateway successfully prepared or handed off
 	// the message for SMTP delivery attempts.
-	EventGatewaySuccess Event = "gateway-success"
+	EventGatewaySuccess EventType = "gateway-success"
 
 	// EventGatewayFailed indicates the delivery gateway could not process or stage the send.
 	// Example: misconfigured sender domain, authentication issue, or gateway internal error.
-	EventGatewayFailed Event = "gateway-failed"
+	EventGatewayFailed EventType = "gateway-failed"
 
 	// EventGatewayDropped indicates the delivery gateway accepted the message but chose
 	// not to attempt outbound delivery (e.g., gateway-side suppression, blocklist match).
-	EventGatewayDropped Event = "gateway-dropped"
+	EventGatewayDropped EventType = "gateway-dropped"
 
 	// ====================================
 	// Mailbox (Target MX / Recipient Mail Server)
@@ -55,32 +55,32 @@ const (
 
 	// EventMailboxAttempt indicates the ESP attempted an SMTP delivery to the recipient mailbox.
 	// Useful for tracking retries vs. successful connections.
-	EventMailboxAttempt Event = "mailbox-attempt"
+	EventMailboxAttempt EventType = "mailbox-attempt"
 
 	// EventMailboxSuccess indicates the recipient mailbox accepted the message with a 2xx response.
 	// This means "delivered to server," but not inbox placement.
-	EventMailboxSuccess Event = "mailbox-success"
+	EventMailboxSuccess EventType = "mailbox-success"
 
 	// EventMailboxFailed indicates a delivery attempt failed without a clear temp/permanent signal.
 	// Example: gateway only reports "delivery failed."
-	EventMailboxFailed Event = "mailbox-failed"
+	EventMailboxFailed EventType = "mailbox-failed"
 
 	// EventMailboxTempFail indicates a temporary SMTP failure (4xx). Gateway may retry.
-	EventMailboxTempFail Event = "mailbox-tempfail"
+	EventMailboxTempFail EventType = "mailbox-tempfail"
 
 	// EventMailboxSenderPermFail indicates a permanent SMTP failure (5xx) due to sender-side issues.
 	// Examples: authentication failure, sender domain blocked, sender IP blacklisted,
 	// DKIM/SPF/DMARC policy failures, sending limit exceeded.
-	EventMailboxSenderPermFail Event = "mailbox-sender-permfail"
+	EventMailboxSenderPermFail EventType = "mailbox-sender-permfail"
 
 	// EventMailboxRecipientPermFail indicates a permanent SMTP failure (5xx) due to recipient-side issues.
 	// Examples: mailbox does not exist, mailbox disabled, recipient domain does not exist,
 	// recipient rejected message. This is the default when failure type is uncertain.
-	EventMailboxRecipientPermFail Event = "mailbox-recipient-permfail"
+	EventMailboxRecipientPermFail EventType = "mailbox-recipient-permfail"
 
 	// EventMailboxQuarantined indicates the recipient mailbox accepted the message
 	// but placed it in quarantine/spam (when gateway provides this signal).
-	EventMailboxQuarantined Event = "mailbox-quarantined"
+	EventMailboxQuarantined EventType = "mailbox-quarantined"
 
 	// ====================================
 	// Engagement (End User Actions)
@@ -88,15 +88,15 @@ const (
 
 	// EventEngagementOpen indicates an open/render was recorded (tracking pixel fired).
 	// Caveat: auto-opens and privacy features (e.g., Apple MPP).
-	EventEngagementOpen Event = "engagement-open"
+	EventEngagementOpen EventType = "engagement-open"
 
 	// EventEngagementClick indicates the recipient clicked a tracked link in the email.
 	// Stronger engagement signal than open.
-	EventEngagementClick Event = "engagement-click"
+	EventEngagementClick EventType = "engagement-click"
 
 	// EventEngagementEngaged is a composite signal defined by the customer.
 	// Could be injected via API if vendor doesn't provide this signal.
-	EventEngagementEngaged Event = "engagement-engaged"
+	EventEngagementEngaged EventType = "engagement-engaged"
 
 	// ====================================
 	// Status (List Management / Preferences)
@@ -108,29 +108,29 @@ const (
 
 	// EventStatusSubscribed indicates the recipient is globally subscribed
 	// (eligible to receive messages subject to other policies and suppressions).
-	EventStatusSubscribed Event = "status-subscribed"
+	EventStatusSubscribed EventType = "status-subscribed"
 
 	// EventStatusUnsubscribed indicates the recipient opted out globally.
 	// Treat as a hard suppression signal for all future sends from this sender.
-	EventStatusUnsubscribed Event = "status-unsubscribed"
+	EventStatusUnsubscribed EventType = "status-unsubscribed"
 
 	// EventStatusGroupSubscribed indicates the recipient opted in to a specific
 	// topic/list/group (e.g., "Product Updates"). Not necessarily global.
-	EventStatusGroupSubscribed Event = "status-group-subscribed"
+	EventStatusGroupSubscribed EventType = "status-group-subscribed"
 
 	// EventStatusGroupUnsubscribed indicates the recipient opted out of a specific
 	// topic/list/group but may remain subscribed to others.
-	EventStatusGroupUnsubscribed Event = "status-group-unsubscribed"
+	EventStatusGroupUnsubscribed EventType = "status-group-unsubscribed"
 
 	// EventStatusSpamReported indicates the recipient reported a message as spam
 	// (e.g., via ISP feedback loop). Treat as an immediate global suppression
 	// and record ISP/FBL details if available.
-	EventStatusSpamReported Event = "status-spam-reported"
+	EventStatusSpamReported EventType = "status-spam-reported"
 
 	// EventStatusSpamCleared indicates the recipient's spam complaint status has been
 	// manually cleared (e.g., by operator review, recipient request, or automated
 	// rehabilitation). This allows the recipient to receive emails again.
-	EventStatusSpamCleared Event = "status-spam-cleared"
+	EventStatusSpamCleared EventType = "status-spam-cleared"
 )
 
 // ====================================
