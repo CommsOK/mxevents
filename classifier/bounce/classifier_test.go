@@ -53,35 +53,39 @@ func TestClassifier_Classify(t *testing.T) {
 			minConfidence:  0.8,
 		},
 		{
-			name: "authentication failure - sender permfail",
+			name: "authentication failure - tempfail (address may be valid)",
 			facts: &mxevents.EventFacts{
 				SMTPCode:           "550",
 				SMTPDeliveryStatus: "5.7.26",
 				SMTPResponse:       "550 5.7.26 This message does not pass authentication checks (SPF and DKIM)",
 			},
-			expectedType:   mxevents.EventMailboxSenderPermFail,
+			// IsToxic() returns false for auth failures - the address itself is valid,
+			// it's a sender configuration issue that could be fixed
+			expectedType:   mxevents.EventMailboxTempFail,
 			expectedReason: mxevents.BounceReasonAuthFailure,
 			minConfidence:  0.8,
 		},
 		{
-			name: "security error (5.7.1) - sender permfail",
+			name: "security error (5.7.1) - tempfail (address may be valid)",
 			facts: &mxevents.EventFacts{
 				SMTPCode:           "550",
 				SMTPDeliveryStatus: "5.7.1",
 				SMTPResponse:       "550 5.7.1 Connection refused, your IP is listed in a blocklist",
 			},
-			expectedType:   mxevents.EventMailboxSenderPermFail,
-			expectedReason: mxevents.BounceReasonSecurityError, // sisimai classifies 5.7.x as security
+			// IsToxic() returns false for security errors - the address itself is valid
+			expectedType:   mxevents.EventMailboxTempFail,
+			expectedReason: mxevents.BounceReasonSecurityError,
 			minConfidence:  0.8,
 		},
 		{
-			name: "spam detected - sender permfail",
+			name: "spam detected - tempfail (address may be valid)",
 			facts: &mxevents.EventFacts{
 				SMTPCode:           "550",
 				SMTPDeliveryStatus: "5.7.1",
 				SMTPResponse:       "550 5.7.1 Message rejected as spam",
 			},
-			expectedType:   mxevents.EventMailboxSenderPermFail,
+			// IsToxic() returns false for spam - the address itself is valid
+			expectedType:   mxevents.EventMailboxTempFail,
 			expectedReason: mxevents.BounceReasonSpamDetected,
 			minConfidence:  0.8,
 		},
@@ -117,12 +121,13 @@ func TestClassifier_Classify(t *testing.T) {
 			expectNil: true,
 		},
 		{
-			name: "only smtp code",
+			name: "only smtp code - tempfail (undefined reason not toxic)",
 			facts: &mxevents.EventFacts{
 				SMTPCode: "550",
 			},
-			expectedType:  mxevents.EventMailboxPermFail, // generic since no diagnostic
-			minConfidence: 0.4,                           // lower confidence with minimal data
+			// IsToxic() returns false for undefined reasons
+			expectedType:  mxevents.EventMailboxTempFail,
+			minConfidence: 0.4,
 		},
 	}
 
@@ -159,32 +164,6 @@ func TestClassifier_Classify(t *testing.T) {
 
 			if result.TaxonomyVersion != mxevents.CurrentTaxonomyVersion {
 				t.Errorf("expected taxonomy version %d, got %d", mxevents.CurrentTaxonomyVersion, result.TaxonomyVersion)
-			}
-		})
-	}
-}
-
-func TestIsHardBounceFromCode(t *testing.T) {
-	tests := []struct {
-		smtpCode       string
-		deliveryStatus string
-		expected       bool
-	}{
-		{"550", "5.1.1", true},
-		{"452", "4.2.2", false},
-		{"421", "", false},
-		{"550", "", true},
-		{"", "5.1.1", true},
-		{"", "4.2.2", false},
-		{"", "", true}, // default to hard bounce
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.smtpCode+"/"+tt.deliveryStatus, func(t *testing.T) {
-			result := isHardBounceFromCode(tt.smtpCode, tt.deliveryStatus)
-			if result != tt.expected {
-				t.Errorf("isHardBounceFromCode(%q, %q) = %v, want %v",
-					tt.smtpCode, tt.deliveryStatus, result, tt.expected)
 			}
 		})
 	}

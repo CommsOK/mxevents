@@ -28,11 +28,20 @@ func (c *Classifier) Classify(ctx *context.Context, facts *mxevents.EventFacts, 
 		sisimaiReason = "undefined"
 	}
 
+	// Set reason on fact so IsToxic() can evaluate it
+	fact.Reason = sisimaiReason
+
 	// Map sisimai reason to our canonical reason
 	bounceReason := mapSisimaiReason(sisimaiReason)
 
-	// Determine if this is a hard bounce based on SMTP code
-	isHardBounce := isHardBounceFromCode(facts.SMTPCode, facts.SMTPDeliveryStatus)
+	// Use sisimai's IsToxic() to determine if this is a permanent failure.
+	// IsToxic() returns true when the address should be removed from mailing lists:
+	// - Hard bounces: userunknown, hostunknown, hasmoved, notaccept, suspend, suppressed
+	// - Soft bounces with 5xx: mailboxfull, filtered, norelaying
+	// - Feedback loops: abuse, fraud, opt-out
+	// This means 5xx infrastructure errors (networkerror, systemerror) are treated as
+	// temporary since the address itself may still be valid.
+	isHardBounce := fact.IsToxic()
 
 	// Classify into sender, recipient, or generic bounce
 	eventType := classifyBounceType(sisimaiReason, isHardBounce)
@@ -57,32 +66,6 @@ func buildSisimaiFactFromEventFacts(facts *mxevents.EventFacts) *siba.Fact {
 		ReplyCode:      facts.SMTPCode,
 		DeliveryStatus: facts.SMTPDeliveryStatus,
 	}
-}
-
-// isHardBounceFromCode determines if a bounce is permanent based on SMTP codes.
-func isHardBounceFromCode(smtpCode, deliveryStatus string) bool {
-	// Check SMTP reply code first (5xx = permanent, 4xx = temporary)
-	if len(smtpCode) > 0 {
-		if smtpCode[0] == '5' {
-			return true
-		}
-		if smtpCode[0] == '4' {
-			return false
-		}
-	}
-
-	// Check delivery status code (5.x.x = permanent, 4.x.x = temporary)
-	if len(deliveryStatus) > 0 {
-		if deliveryStatus[0] == '5' {
-			return true
-		}
-		if deliveryStatus[0] == '4' {
-			return false
-		}
-	}
-
-	// Default to hard bounce if we can't determine
-	return true
 }
 
 // recipientReasons are bounce reasons attributable to the recipient.
