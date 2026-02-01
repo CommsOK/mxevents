@@ -28,3 +28,26 @@ func NewEventClassifier(ctx *context.Context, enrichers []mxevents.Enricher, cla
 func NewDefaultEventClassifier(ctx *context.Context) *EventClassifier {
 	return &EventClassifier{enrichers: DefaultEnrichers, classifiers: DefaultClassifiers}
 }
+
+func (c *EventClassifier) Classify(ctx *context.Context, facts *mxevents.EventFacts) (*mxevents.ClassificationResult, error) {
+	// Enrich facts first
+	for _, enricher := range c.enrichers {
+		if err := enricher.Enrich(ctx, facts); err != nil {
+			return nil, err
+		}
+	}
+
+	// Get all classifications and return the one with the highest confidence
+	var bestResult *mxevents.ClassificationResult
+	for _, classifier := range c.classifiers {
+		result, err := classifier.Classify(ctx, facts)
+		if err != nil {
+			return nil, err
+		}
+		if bestResult == nil || result.Confidence > bestResult.Confidence {
+			bestResult = result
+		}
+	}
+
+	return bestResult, nil
+}
