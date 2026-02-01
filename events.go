@@ -2,6 +2,14 @@
 // It serves as the source of truth for event types across the email delivery pipeline.
 package mxevents
 
+// CurrentTaxonomyVersion is the current version of the taxonomy. This is a semver packaged as an int where each two
+// digits represent a version number.
+// Examples:
+// - 100 becomes 0.1.0
+// - 110 becomes 0.1.10
+// - 10203 becomes 1.2.3
+const CurrentTaxonomyVersion = 100 // 0.1.0
+
 // EventType represents a canonical email event type.
 type EventType string
 

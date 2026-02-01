@@ -29,7 +29,12 @@ func NewDefaultEventClassifier(ctx *context.Context) *EventClassifier {
 	return &EventClassifier{enrichers: DefaultEnrichers, classifiers: DefaultClassifiers}
 }
 
-func (c *EventClassifier) Classify(ctx *context.Context, facts *mxevents.EventFacts) (*mxevents.ClassificationResult, error) {
+// Classify classifies the event and returns event details according to the taxonomy version requested.
+// Parameters:
+//   - ctx: context for cancellation and tracing
+//   - facts: event facts to classify
+//   - taxonomyVersion: version of the taxonomy to use for classification. If 0, uses the latest version.
+func (c *EventClassifier) Classify(ctx *context.Context, facts *mxevents.EventFacts, taxonomyVersion int) (*mxevents.ClassificationResult, error) {
 	// Enrich facts first
 	for _, enricher := range c.enrichers {
 		if err := enricher.Enrich(ctx, facts); err != nil {
@@ -40,7 +45,7 @@ func (c *EventClassifier) Classify(ctx *context.Context, facts *mxevents.EventFa
 	// Get all classifications and return the one with the highest confidence
 	var bestResult *mxevents.ClassificationResult
 	for _, classifier := range c.classifiers {
-		result, err := classifier.Classify(ctx, facts)
+		result, err := classifier.Classify(ctx, facts, taxonomyVersion)
 		if err != nil {
 			return nil, err
 		}

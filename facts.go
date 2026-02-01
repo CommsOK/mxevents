@@ -18,8 +18,9 @@ type RecipientFacts struct {
 }
 
 type ClassificationResult struct {
-	EventType  EventType
-	Reason     Reason
-	Confidence float32
-	Facts      *EventFacts
+	TaxonomyVersion int
+	EventType       EventType
+	Reason          Reason
+	Confidence      float32
+	Facts           *EventFacts
 }
