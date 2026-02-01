@@ -69,22 +69,69 @@ const (
 	// This means "delivered to server," but not inbox placement.
 	EventMailboxSuccess EventType = "mailbox-success"
 
-	// EventMailboxFailed indicates a delivery attempt failed without a clear temp/permanent signal.
-	// Example: gateway only reports "delivery failed."
+	// EventMailboxFailed indicates a delivery attempt failed before a reliable SMTP-level
+	// outcome could be determined.
+	// Examples include MX lookup failures, connection or TLS negotiation failures, or
+	// gateways that report only a generic "delivery failed" status.
+	//
+	// Semantics:
+	// - Retry expectation: unknown
+	// - Attribution: unknown
+	//
+	// Notes:
+	// - This event may occur before or during the SMTP session.
+	// - It does not assert temporary or permanent failure.
 	EventMailboxFailed EventType = "mailbox-failed"
 
-	// EventMailboxTempFail indicates a temporary SMTP failure (4xx). Gateway may retry.
+	// EventMailboxTempFail indicates a temporary delivery failure (SMTP 4xx or equivalent
+	// provider signal) where retry may succeed.
+	//
+	// Semantics:
+	// - Retry expectation: may succeed
+	// - Attribution: unknown
+	//
+	// Notes:
+	// - Temporary failures may still repeat or escalate, but this event alone does not
+	//   assert permanent failure.
 	EventMailboxTempFail EventType = "mailbox-tempfail"
 
-	// EventMailboxSenderPermFail indicates a permanent SMTP failure (5xx) due to sender-side issues.
-	// Examples: authentication failure, sender domain blocked, sender IP blacklisted,
-	// DKIM/SPF/DMARC policy failures, sending limit exceeded.
+	// EventMailboxSenderPermFail indicates a permanent delivery failure attributable to
+	// sender-side causes.
+	// Examples: authentication failure, policy rejection, reputation-based blocking,
+	// DKIM/SPF/DMARC failures, sending limits exceeded.
+	//
+	// Semantics:
+	// - Retry expectation: not expected to succeed
+	// - Attribution: sender-side
+	//
+	// Notes:
+	// - This event does not imply recipient mailbox invalidity.
 	EventMailboxSenderPermFail EventType = "mailbox-sender-permfail"
 
-	// EventMailboxRecipientPermFail indicates a permanent SMTP failure (5xx) due to recipient-side issues.
-	// Examples: mailbox does not exist, mailbox disabled, recipient domain does not exist,
-	// recipient rejected message. This is the default when failure type is uncertain.
+	// EventMailboxRecipientPermFail indicates a permanent delivery failure attributable to
+	// recipient-side causes.
+	// Examples: mailbox does not exist, mailbox disabled, recipient domain does not exist.
+	//
+	// Semantics:
+	// - Retry expectation: not expected to succeed
+	// - Attribution: recipient-side
+	//
+	// Notes:
+	// - Use only when evidence supports recipient-side permanence.
 	EventMailboxRecipientPermFail EventType = "mailbox-recipient-permfail"
+
+	// EventMailboxPermFail indicates a permanent delivery failure (SMTP 5xx or equivalent
+	// provider signal) where retry is not expected to succeed, but the failure cannot be
+	// confidently attributed to sender-side or recipient-side causes.
+	//
+	// Semantics:
+	// - Retry expectation: not expected to succeed
+	// - Attribution: unknown
+	//
+	// Notes:
+	// - This event intentionally avoids assigning blame without sufficient evidence.
+	// - It may be reclassified if additional signals become available.
+	EventMailboxPermFail EventType = "mailbox-permfail"
 
 	// EventMailboxQuarantined indicates the recipient mailbox accepted the message
 	// but placed it in quarantine/spam (when gateway provides this signal).
