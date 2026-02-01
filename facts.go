@@ -1,8 +1,6 @@
-package types
+package mxevents
 
-import "github.com/commsok/mxevents"
-
-type Facts struct {
+type EventFacts struct {
 	Sender             SenderFacts
 	Recipient          RecipientFacts
 	SMTPResponse       string
@@ -20,8 +18,8 @@ type RecipientFacts struct {
 }
 
 type ClassificationResult struct {
-	EventType  mxevents.EventType
-	Reason     mxevents.Reason
+	EventType  EventType
+	Reason     Reason
 	Confidence float32
-	Facts      *Facts
+	Facts      *EventFacts
 }

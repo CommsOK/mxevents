@@ -1,7 +1,14 @@
 package bounce
 
-import "github.com/commsok/mxevents/classifier/types"
+import (
+	"context"
 
-func Classify(facts *types.Facts) *types.ClassificationResult {
-	return nil
+	"github.com/commsok/mxevents"
+)
+
+type Classifier struct {
+}
+
+func (c *Classifier) Classify(ctx *context.Context, facts *mxevents.EventFacts) (*mxevents.ClassificationResult, error) {
+	return nil, nil
 }
