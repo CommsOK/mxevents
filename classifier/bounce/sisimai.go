@@ -145,6 +145,7 @@ func mapSisimaiReason(sisimaiReason string) mxevents.Reason {
 		"norelaying":      mxevents.BounceReasonNoRelaying,
 		"speeding":        mxevents.BounceReasonRateLimited,
 		"toomanyconn":     mxevents.BounceReasonRateLimited,
+		"ratelimited":     mxevents.BounceReasonRateLimited,
 		"systemfull":      mxevents.BounceReasonSystemFull,
 		"systemerror":     mxevents.BounceReasonSystemError,
 		"networkerror":    mxevents.BounceReasonNetworkError,
