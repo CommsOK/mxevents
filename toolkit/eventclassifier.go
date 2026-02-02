@@ -50,7 +50,7 @@ func (c *EventClassifier) Classify(ctx *context.Context, facts *mxevents.EventFa
 		if err != nil {
 			return nil, err
 		}
-		if bestResult == nil || result.Confidence > bestResult.Confidence {
+		if result != nil && (bestResult == nil || result.Confidence > bestResult.Confidence) {
 			bestResult = result
 		}
 	}
