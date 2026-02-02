@@ -9,12 +9,12 @@ import (
 	"libsisimai.org/sisimai/v5/siba"
 )
 
-// Classifier classifies bounce events using sisimai's reason detection.
-type Classifier struct {
+// SisimaiClassifier classifies bounce events using sisimai's reason detection.
+type SisimaiClassifier struct {
 }
 
 // Classify analyzes SMTP response data and classifies the bounce event.
-func (c *Classifier) Classify(ctx *context.Context, facts *mxevents.EventFacts, taxonomyVersion int) (*mxevents.ClassificationResult, error) {
+func (c *SisimaiClassifier) Classify(ctx *context.Context, facts *mxevents.EventFacts, taxonomyVersion int) (*mxevents.ClassificationResult, error) {
 	if facts.SMTPResponse == "" && facts.SMTPCode == "" && facts.SMTPDeliveryStatus == "" {
 		return nil, nil
 	}

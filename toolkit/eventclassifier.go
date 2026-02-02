@@ -18,7 +18,7 @@ var DefaultEnrichers = []mxevents.Enricher{
 }
 
 var DefaultClassifiers = []mxevents.Classifier{
-	&bounce.Classifier{},
+	&bounce.SisimaiClassifier{},
 }
 
 func NewEventClassifier(ctx *context.Context, enrichers []mxevents.Enricher, classifiers []mxevents.Classifier) *EventClassifier {

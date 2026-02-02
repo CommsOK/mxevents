@@ -7,8 +7,8 @@ import (
 	"github.com/commsok/mxevents"
 )
 
-func TestClassifier_Classify(t *testing.T) {
-	classifier := &Classifier{}
+func TestSisimaiClassifier_Classify(t *testing.T) {
+	classifier := &SisimaiClassifier{}
 	ctx := context.Background()
 
 	tests := []struct {
