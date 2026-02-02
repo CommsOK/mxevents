@@ -14,7 +14,8 @@ type SenderFacts struct {
 }
 
 type RecipientFacts struct {
-	Vendor string
+	VendorURI       string
+	RecipientDomain string
 }
 
 type ClassificationResult struct {
