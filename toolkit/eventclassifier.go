@@ -21,11 +21,11 @@ var DefaultClassifiers = []mxevents.Classifier{
 	&bounce.SisimaiClassifier{},
 }
 
-func NewEventClassifier(ctx *context.Context, enrichers []mxevents.Enricher, classifiers []mxevents.Classifier) *EventClassifier {
+func NewEventClassifier(enrichers []mxevents.Enricher, classifiers []mxevents.Classifier) *EventClassifier {
 	return &EventClassifier{enrichers: enrichers, classifiers: classifiers}
 }
 
-func NewDefaultEventClassifier(ctx *context.Context) *EventClassifier {
+func NewDefaultEventClassifier() *EventClassifier {
 	return &EventClassifier{enrichers: DefaultEnrichers, classifiers: DefaultClassifiers}
 }
 
