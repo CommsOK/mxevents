@@ -6,6 +6,11 @@ type EventFacts struct {
 	SMTPResponse       string
 	SMTPCode           string
 	SMTPDeliveryStatus string
+	// ReasonCode is the vendor-specific reason code/enum for the event outcome.
+	// Example: HubSpot's "PREVIOUSLY_BOUNCED", SendGrid's "bounced"
+	ReasonCode string
+	// ReasonMessage is the human-readable explanation provided by the vendor.
+	ReasonMessage string
 }
 
 type SenderFacts struct {
