@@ -470,6 +470,19 @@ const (
 	// - Fix message construction in source system
 	// - No suppression
 	ReasonConfigInvalidMessage Reason = "config.InvalidMessage"
+
+	// ReasonConfigRecipientNotFound indicates the recipient does not exist in the origin system.
+	//
+	// Examples:
+	// - Contact was deleted from CRM
+	// - Invalid recipient ID or reference
+	// - Recipient record not found in source database
+	//
+	// Actionability:
+	// - Remove recipient from send list
+	// - Verify recipient data integrity in source system
+	// - No suppression (recipient doesn't exist to suppress)
+	ReasonConfigRecipientNotFound Reason = "config.RecipientNotFound"
 )
 
 // ====================================
