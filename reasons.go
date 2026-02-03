@@ -238,6 +238,30 @@ const (
 	// Reliable inferences:
 	// - Final failure after temporary retries
 	ReasonSMTPExpired Reason = "smtp.Expired"
+
+	// ReasonSMTPContentError indicates the message was rejected due to malformed
+	// or non-compliant message content.
+	//
+	// Detectable signals:
+	// - Invalid or malformed MIME structure
+	// - Missing or invalid headers
+	// - RFC compliance violations reported by the remote server
+	//
+	// Reliable inferences:
+	// - Usually permanent until message construction is corrected
+	ReasonSMTPContentError Reason = "smtp.ContentError"
+
+	// ReasonNetworkError indicates a delivery attempt failed due to a network-related
+	// issue that could not be reliably classified further.
+	//
+	// Detectable signals:
+	// - Generic network failure diagnostics
+	// - Sisimai reason "networkerror"
+	//
+	// Reliable inferences:
+	// - Usually temporary
+	// - Retry may succeed
+	ReasonNetworkError Reason = "network.Error"
 )
 
 // ====================================

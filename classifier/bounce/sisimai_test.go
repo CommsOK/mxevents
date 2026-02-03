@@ -27,7 +27,7 @@ func TestSisimaiClassifier_Classify(t *testing.T) {
 				SMTPResponse:       "550 5.1.1 The email account that you tried to reach does not exist",
 			},
 			expectedType:   mxevents.EventMailboxRecipientPermFail,
-			expectedReason: mxevents.BounceReasonUserUnknown,
+			expectedReason: mxevents.ReasonSMTPUserUnknown,
 			minConfidence:  0.8,
 		},
 		{
@@ -38,7 +38,7 @@ func TestSisimaiClassifier_Classify(t *testing.T) {
 				SMTPResponse:       "552 5.2.2 Mailbox full",
 			},
 			expectedType:   mxevents.EventMailboxRecipientPermFail,
-			expectedReason: mxevents.BounceReasonMailboxFull,
+			expectedReason: mxevents.ReasonSMTPMailboxFull,
 			minConfidence:  0.8,
 		},
 		{
@@ -49,7 +49,7 @@ func TestSisimaiClassifier_Classify(t *testing.T) {
 				SMTPResponse:       "452 4.2.2 Mailbox full, try again later",
 			},
 			expectedType:   mxevents.EventMailboxTempFail,
-			expectedReason: mxevents.BounceReasonMailboxFull,
+			expectedReason: mxevents.ReasonSMTPMailboxFull,
 			minConfidence:  0.8,
 		},
 		{
@@ -62,7 +62,7 @@ func TestSisimaiClassifier_Classify(t *testing.T) {
 			// IsToxic() returns false for auth failures - the address itself is valid,
 			// it's a sender configuration issue that could be fixed
 			expectedType:   mxevents.EventMailboxTempFail,
-			expectedReason: mxevents.BounceReasonAuthFailure,
+			expectedReason: mxevents.ReasonSMTPAuthFailure,
 			minConfidence:  0.8,
 		},
 		{
@@ -74,7 +74,7 @@ func TestSisimaiClassifier_Classify(t *testing.T) {
 			},
 			// IsToxic() returns false for security errors - the address itself is valid
 			expectedType:   mxevents.EventMailboxTempFail,
-			expectedReason: mxevents.BounceReasonSecurityError,
+			expectedReason: mxevents.ReasonPolicyBlocked,
 			minConfidence:  0.8,
 		},
 		{
@@ -86,7 +86,7 @@ func TestSisimaiClassifier_Classify(t *testing.T) {
 			},
 			// IsToxic() returns false for spam - the address itself is valid
 			expectedType:   mxevents.EventMailboxTempFail,
-			expectedReason: mxevents.BounceReasonSpamDetected,
+			expectedReason: mxevents.ReasonSMTPSpamDetected,
 			minConfidence:  0.8,
 		},
 		{
@@ -97,7 +97,7 @@ func TestSisimaiClassifier_Classify(t *testing.T) {
 				SMTPResponse:       "421 4.7.0 Too many connections, try again later",
 			},
 			expectedType:   mxevents.EventMailboxTempFail,
-			expectedReason: mxevents.BounceReasonRateLimited,
+			expectedReason: mxevents.ReasonSMTPRateLimited,
 			minConfidence:  0.8,
 		},
 		{
@@ -108,7 +108,7 @@ func TestSisimaiClassifier_Classify(t *testing.T) {
 				SMTPResponse:       "550 5.1.2 Host unknown",
 			},
 			expectedType:   mxevents.EventMailboxRecipientPermFail,
-			expectedReason: mxevents.BounceReasonHostUnknown,
+			expectedReason: mxevents.ReasonNetworkDnsFailure,
 			minConfidence:  0.8,
 		},
 		{
@@ -214,15 +214,15 @@ func TestMapSisimaiReason(t *testing.T) {
 		sisimaiReason  string
 		expectedReason mxevents.Reason
 	}{
-		{"userunknown", mxevents.BounceReasonUserUnknown},
-		{"hostunknown", mxevents.BounceReasonHostUnknown},
-		{"mailboxfull", mxevents.BounceReasonMailboxFull},
-		{"authfailure", mxevents.BounceReasonAuthFailure},
-		{"blocked", mxevents.BounceReasonBlocked},
-		{"spamdetected", mxevents.BounceReasonSpamDetected},
-		{"undefined", mxevents.BounceReasonUndefined},
-		{"unknownreason", mxevents.BounceReasonUndefined}, // unknown maps to undefined
-		{"USERUNKNOWN", mxevents.BounceReasonUserUnknown}, // case insensitive
+		{"userunknown", mxevents.ReasonSMTPUserUnknown},
+		{"hostunknown", mxevents.ReasonNetworkDnsFailure},
+		{"mailboxfull", mxevents.ReasonSMTPMailboxFull},
+		{"authfailure", mxevents.ReasonSMTPAuthFailure},
+		{"blocked", mxevents.ReasonSMTPBlocked},
+		{"spamdetected", mxevents.ReasonSMTPSpamDetected},
+		{"undefined", mxevents.ReasonUnknown},
+		{"unknownreason", mxevents.ReasonUnknown},       // unknown maps to unknown
+		{"USERUNKNOWN", mxevents.ReasonSMTPUserUnknown}, // case insensitive
 	}
 
 	for _, tt := range tests {

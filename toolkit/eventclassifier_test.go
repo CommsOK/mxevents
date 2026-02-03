@@ -63,14 +63,14 @@ func TestEventClassifier_Classify_MultipleClassifiers_SelectsHighestConfidence(t
 	lowConfidenceResult := &mxevents.ClassificationResult{
 		TaxonomyVersion: mxevents.CurrentTaxonomyVersion,
 		EventType:       mxevents.EventMailboxPermFail,
-		Reason:          mxevents.BounceReasonUndefined,
+		Reason:          mxevents.ReasonUnknown,
 		Confidence:      0.3,
 	}
 
 	highConfidenceResult := &mxevents.ClassificationResult{
 		TaxonomyVersion: mxevents.CurrentTaxonomyVersion,
 		EventType:       mxevents.EventMailboxRecipientPermFail,
-		Reason:          mxevents.BounceReasonUserUnknown,
+		Reason:          mxevents.ReasonSMTPUserUnknown,
 		Confidence:      0.9,
 	}
 
@@ -101,8 +101,8 @@ func TestEventClassifier_Classify_MultipleClassifiers_SelectsHighestConfidence(t
 		t.Errorf("expected confidence 0.9, got %f", result.Confidence)
 	}
 
-	if result.Reason != mxevents.BounceReasonUserUnknown {
-		t.Errorf("expected reason %s, got %s", mxevents.BounceReasonUserUnknown, result.Reason)
+	if result.Reason != mxevents.ReasonSMTPUserUnknown {
+		t.Errorf("expected reason %s, got %s", mxevents.ReasonSMTPUserUnknown, result.Reason)
 	}
 }
 
@@ -112,7 +112,7 @@ func TestEventClassifier_Classify_MixedNilAndNonNilResults(t *testing.T) {
 	validResult := &mxevents.ClassificationResult{
 		TaxonomyVersion: mxevents.CurrentTaxonomyVersion,
 		EventType:       mxevents.EventMailboxPermFail,
-		Reason:          mxevents.BounceReasonUserUnknown,
+		Reason:          mxevents.ReasonSMTPUserUnknown,
 		Confidence:      0.8,
 	}
 
