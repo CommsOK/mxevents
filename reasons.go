@@ -372,6 +372,15 @@ const (
 	// - Suppression applies
 	// - May be reversible depending on operator policy
 	ReasonSuppressionAdminBlocked Reason = "suppression.AdminBlocked"
+
+	// ReasonSuppressionCleared indicates the recipient was removed from a suppression list.
+	// This is used for "unsuppression" events like UNBOUNCE where an address is reactivated.
+	//
+	// Actionability:
+	// - Suppression removed
+	// - Recipient is eligible for sending again
+	// - Commonly used with EventStatusSubscribed to indicate reactivation
+	ReasonSuppressionCleared Reason = "suppression.Cleared"
 )
 
 // ====================================
@@ -653,6 +662,8 @@ var AllowedReasonNamespacesByEventType = map[EventType][]ReasonNamespace{
 	EventMailboxRecipientPermFail: {NSMTP, NSUnknown},
 
 	// Status
+	EventStatusSubscribed:        {NSSuppression, NSSystem, NSUnknown}, // suppression.Cleared for reactivation
+	EventStatusGroupSubscribed:   {NSSuppression, NSSystem, NSUnknown}, // suppression.Cleared for reactivation
 	EventStatusUnsubscribed:      {NSUnsubscribe, NSSuppression, NSUnknown},
 	EventStatusGroupUnsubscribed: {NSUnsubscribe, NSSuppression, NSUnknown},
 	EventStatusSpamReported:      {NSComplaint, NSSuppression, NSUnknown},
