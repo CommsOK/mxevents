@@ -438,6 +438,29 @@ const (
 	// - Fix configuration
 	// - No suppression
 	ReasonConfigInvalid Reason = "config.Invalid"
+
+	// ReasonConfigInvalidRecipient indicates the recipient address is malformed or unparseable.
+	//
+	// Examples:
+	// - Malformed email address syntax
+	// - Missing or invalid to/cc/bcc fields
+	//
+	// Actionability:
+	// - Fix recipient address in source data
+	// - No suppression
+	ReasonConfigInvalidRecipient Reason = "config.InvalidRecipient"
+
+	// ReasonConfigInvalidMessage indicates the message structure is invalid.
+	//
+	// Examples:
+	// - Missing required fields (subject, body)
+	// - Invalid content type or encoding
+	// - Malformed attachments
+	//
+	// Actionability:
+	// - Fix message construction in source system
+	// - No suppression
+	ReasonConfigInvalidMessage Reason = "config.InvalidMessage"
 )
 
 // ====================================
