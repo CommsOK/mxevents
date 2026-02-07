@@ -15,7 +15,6 @@ type EventClassifier struct {
 
 var DefaultEnrichers = []mxevents.Enricher{
 	&enrichment.SMTPEnricher{},
-	&enrichment.CommonMailboxVendorURIEnricher{},
 }
 
 var DefaultClassifiers = []mxevents.Classifier{

@@ -7,6 +7,8 @@ import (
 	"github.com/commsok/mxevents"
 )
 
+// CommonMailboxVendorURIEnricher is a simple reference enricher that sets the MailboxVendorURI field based on the recipient domain.
+// It is not intended to be a complete solution, but rather a starting point for custom enrichers.
 type CommonMailboxVendorURIEnricher struct{}
 
 func (e *CommonMailboxVendorURIEnricher) Enrich(ctx *context.Context, facts *mxevents.EventFacts) error {
