@@ -1,51 +1,76 @@
 package mxevents
 
-// VendorURI constants represent behavior bucket identifiers.
-// They look like domains but are NOT the recipient's domain.
-// They are canonical keys you normalize to, to hint expected mailbox behavior.
+// This file contains two distinct vendor concepts:
+//  1) SourceVendor: the system that generated the event (ESP webhook, CRM, etc.)
+//  2) MailboxVendorURI: the recipient mailbox provider behavior bucket (Gmail, Outlook, ...)
+//
+// This package intentionally distinguishes between the event source vendor and
+// the recipient mailbox vendor.
+
+// SourceVendor is the vendor/platform that generated the event.
+type SourceVendor string
+
+// MailboxVendorURI is a canonical string key for mailbox provider behavior.
+// Values look like domains but are NOT the recipient's domain.
+type MailboxVendorURI string
+
+// SourceVendor* constants identify the event source (ESP/CRM/etc.).
+// This list is not exhaustive; callers may use custom strings.
 const (
-	// VendorURIGmail represents Google-backed mailbox behavior (Gmail + Google Workspace hosted domains).
-	VendorURIGmail = "gmail.com"
+	// SourceVendorUnknown is the fallback when you cannot identify the event source.
+	SourceVendorUnknown SourceVendor = "unknown"
 
-	// VendorURIOutlook represents Microsoft-backed mailbox behavior (Outlook/Hotmail/Live/MSN + Microsoft 365 hosted domains).
-	VendorURIOutlook = "outlook.com"
+	// SourceVendorSendGrid identifies SendGrid as the event source.
+	SourceVendorSendGrid SourceVendor = "sendgrid"
 
-	// VendorURIYahoo represents Yahoo-backed mailbox behavior (Yahoo + AOL, and related).
-	VendorURIYahoo = "yahoo.com"
+	// SourceVendorHubSpot identifies HubSpot as the event source.
+	SourceVendorHubSpot SourceVendor = "hubspot"
+)
 
-	// VendorURIiCloud represents Apple-backed mailbox behavior (iCloud + legacy Me/Mac).
-	VendorURIiCloud = "icloud.com"
+// MailboxVendorURI* constants represent mailbox provider behavior buckets.
+const (
+	// MailboxVendorURIGmail represents Google-backed mailbox behavior (Gmail + Google Workspace hosted domains).
+	MailboxVendorURIGmail MailboxVendorURI = "gmail.com"
 
-	// VendorURIProton represents Proton-backed mailbox behavior.
-	VendorURIProton = "proton.me"
+	// MailboxVendorURIOutlook represents Microsoft-backed mailbox behavior (Outlook/Hotmail/Live/MSN + Microsoft 365 hosted domains).
+	MailboxVendorURIOutlook MailboxVendorURI = "outlook.com"
 
-	// VendorURIFastmail represents Fastmail-backed mailbox behavior.
-	VendorURIFastmail = "fastmail.com"
+	// MailboxVendorURIYahoo represents Yahoo-backed mailbox behavior (Yahoo + AOL, and related).
+	MailboxVendorURIYahoo MailboxVendorURI = "yahoo.com"
 
-	// VendorURIZoho represents Zoho-backed mailbox behavior (Zoho Mail hosted domains).
-	VendorURIZoho = "zoho.com"
+	// MailboxVendorURIiCloud represents Apple-backed mailbox behavior (iCloud + legacy Me/Mac).
+	MailboxVendorURIiCloud MailboxVendorURI = "icloud.com"
 
-	// VendorURIYandex represents Yandex-backed mailbox behavior.
-	VendorURIYandex = "yandex.com"
+	// MailboxVendorURIProton represents Proton-backed mailbox behavior.
+	MailboxVendorURIProton MailboxVendorURI = "proton.me"
 
-	// VendorURIGMX represents GMX / mail.com behavior (United Internet).
-	VendorURIGMX = "gmx.com"
+	// MailboxVendorURIFastmail represents Fastmail-backed mailbox behavior.
+	MailboxVendorURIFastmail MailboxVendorURI = "fastmail.com"
 
-	// VendorURITuta represents Tuta (Tutanota) behavior.
-	VendorURITuta = "tuta.com"
+	// MailboxVendorURIZoho represents Zoho-backed mailbox behavior (Zoho Mail hosted domains).
+	MailboxVendorURIZoho MailboxVendorURI = "zoho.com"
 
-	// VendorURINaver represents Naver (Korea) behavior.
-	VendorURINaver = "naver.com"
+	// MailboxVendorURIYandex represents Yandex-backed mailbox behavior.
+	MailboxVendorURIYandex MailboxVendorURI = "yandex.com"
 
-	// VendorURIDaum represents Daum / Kakao (Korea) behavior.
-	VendorURIDaum = "daum.net"
+	// MailboxVendorURIGMX represents GMX / mail.com behavior (United Internet).
+	MailboxVendorURIGMX MailboxVendorURI = "gmx.com"
 
-	// VendorURIMailRu represents Mail.ru (VK) behavior.
-	VendorURIMailRu = "mail.ru"
+	// MailboxVendorURITuta represents Tuta (Tutanota) behavior.
+	MailboxVendorURITuta MailboxVendorURI = "tuta.com"
 
-	// VendorURIComcast represents Comcast behavior (big US ISP bucket; optional).
-	VendorURIComcast = "comcast.net"
+	// MailboxVendorURINaver represents Naver (Korea) behavior.
+	MailboxVendorURINaver MailboxVendorURI = "naver.com"
 
-	// VendorURIUnknown is the default bucket when you cannot infer provider behavior.
-	VendorURIUnknown = "unknown"
+	// MailboxVendorURIDaum represents Daum / Kakao (Korea) behavior.
+	MailboxVendorURIDaum MailboxVendorURI = "daum.net"
+
+	// MailboxVendorURIMailRu represents Mail.ru (VK) behavior.
+	MailboxVendorURIMailRu MailboxVendorURI = "mail.ru"
+
+	// MailboxVendorURIComcast represents Comcast behavior (big US ISP bucket; optional).
+	MailboxVendorURIComcast MailboxVendorURI = "comcast.net"
+
+	// MailboxVendorURIUnknown is the default bucket when you cannot infer provider behavior.
+	MailboxVendorURIUnknown MailboxVendorURI = "unknown"
 )

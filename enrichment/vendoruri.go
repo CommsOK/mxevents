@@ -7,11 +7,10 @@ import (
 	"github.com/commsok/mxevents"
 )
 
-type CommonVendorURIEnricher struct {
-}
+type CommonMailboxVendorURIEnricher struct{}
 
-func (e *CommonVendorURIEnricher) Enrich(ctx *context.Context, facts *mxevents.EventFacts) error {
-	if facts.Recipient.VendorURI != "" {
+func (e *CommonMailboxVendorURIEnricher) Enrich(ctx *context.Context, facts *mxevents.EventFacts) error {
+	if facts.Recipient.MailboxVendorURI != "" {
 		return nil
 	}
 
@@ -21,76 +20,76 @@ func (e *CommonVendorURIEnricher) Enrich(ctx *context.Context, facts *mxevents.E
 
 	// Normalize domain to lowercase for case-insensitive matching
 	domain := strings.ToLower(facts.Recipient.RecipientDomain)
-	if vendorURI, ok := CommonDomainToVendorURI[domain]; ok {
-		facts.Recipient.VendorURI = vendorURI
+	if vendorURI, ok := CommonDomainToMailboxVendorURI[domain]; ok {
+		facts.Recipient.MailboxVendorURI = vendorURI
 	}
 
 	return nil
 }
 
-// CommonDomainToVendorURI maps common recipient domains to their corresponding VendorURI buckets.
+// CommonDomainToMailboxVendorURI maps common recipient domains to their corresponding mailbox vendor URI buckets.
 // This mapping is based on domain name alone and includes only the "obvious" mappings.
-var CommonDomainToVendorURI = map[string]string{
+var CommonDomainToMailboxVendorURI = map[string]mxevents.MailboxVendorURI{
 	// Google
-	"gmail.com":      mxevents.VendorURIGmail,
-	"googlemail.com": mxevents.VendorURIGmail,
+	"gmail.com":      mxevents.MailboxVendorURIGmail,
+	"googlemail.com": mxevents.MailboxVendorURIGmail,
 
 	// Microsoft
-	"outlook.com": mxevents.VendorURIOutlook,
-	"hotmail.com": mxevents.VendorURIOutlook,
-	"live.com":    mxevents.VendorURIOutlook,
-	"msn.com":     mxevents.VendorURIOutlook,
+	"outlook.com": mxevents.MailboxVendorURIOutlook,
+	"hotmail.com": mxevents.MailboxVendorURIOutlook,
+	"live.com":    mxevents.MailboxVendorURIOutlook,
+	"msn.com":     mxevents.MailboxVendorURIOutlook,
 
 	// Yahoo / AOL
-	"yahoo.com":      mxevents.VendorURIYahoo,
-	"ymail.com":      mxevents.VendorURIYahoo,
-	"rocketmail.com": mxevents.VendorURIYahoo,
-	"aol.com":        mxevents.VendorURIYahoo,
+	"yahoo.com":      mxevents.MailboxVendorURIYahoo,
+	"ymail.com":      mxevents.MailboxVendorURIYahoo,
+	"rocketmail.com": mxevents.MailboxVendorURIYahoo,
+	"aol.com":        mxevents.MailboxVendorURIYahoo,
 
 	// Apple
-	"icloud.com": mxevents.VendorURIiCloud,
-	"me.com":     mxevents.VendorURIiCloud,
-	"mac.com":    mxevents.VendorURIiCloud,
+	"icloud.com": mxevents.MailboxVendorURIiCloud,
+	"me.com":     mxevents.MailboxVendorURIiCloud,
+	"mac.com":    mxevents.MailboxVendorURIiCloud,
 
 	// Proton
-	"proton.me":      mxevents.VendorURIProton,
-	"protonmail.com": mxevents.VendorURIProton,
-	"pm.me":          mxevents.VendorURIProton,
+	"proton.me":      mxevents.MailboxVendorURIProton,
+	"protonmail.com": mxevents.MailboxVendorURIProton,
+	"pm.me":          mxevents.MailboxVendorURIProton,
 
 	// Fastmail
-	"fastmail.com": mxevents.VendorURIFastmail,
+	"fastmail.com": mxevents.MailboxVendorURIFastmail,
 
 	// Zoho
-	"zoho.com":     mxevents.VendorURIZoho,
-	"zohomail.com": mxevents.VendorURIZoho,
+	"zoho.com":     mxevents.MailboxVendorURIZoho,
+	"zohomail.com": mxevents.MailboxVendorURIZoho,
 
 	// Yandex
-	"yandex.com": mxevents.VendorURIYandex,
-	"yandex.ru":  mxevents.VendorURIYandex,
-	"ya.ru":      mxevents.VendorURIYandex,
+	"yandex.com": mxevents.MailboxVendorURIYandex,
+	"yandex.ru":  mxevents.MailboxVendorURIYandex,
+	"ya.ru":      mxevents.MailboxVendorURIYandex,
 
 	// GMX / Mail.com
-	"gmx.com":  mxevents.VendorURIGMX,
-	"gmx.de":   mxevents.VendorURIGMX,
-	"gmx.net":  mxevents.VendorURIGMX,
-	"mail.com": mxevents.VendorURIGMX,
+	"gmx.com":  mxevents.MailboxVendorURIGMX,
+	"gmx.de":   mxevents.MailboxVendorURIGMX,
+	"gmx.net":  mxevents.MailboxVendorURIGMX,
+	"mail.com": mxevents.MailboxVendorURIGMX,
 
 	// Tuta (Tutanota)
-	"tuta.com":     mxevents.VendorURITuta,
-	"tutanota.com": mxevents.VendorURITuta,
-	"tutanota.de":  mxevents.VendorURITuta,
+	"tuta.com":     mxevents.MailboxVendorURITuta,
+	"tutanota.com": mxevents.MailboxVendorURITuta,
+	"tutanota.de":  mxevents.MailboxVendorURITuta,
 
 	// Korea
-	"naver.com":   mxevents.VendorURINaver,
-	"daum.net":    mxevents.VendorURIDaum,
-	"hanmail.net": mxevents.VendorURIDaum,
+	"naver.com":   mxevents.MailboxVendorURINaver,
+	"daum.net":    mxevents.MailboxVendorURIDaum,
+	"hanmail.net": mxevents.MailboxVendorURIDaum,
 
 	// Mail.ru (VK)
-	"mail.ru":  mxevents.VendorURIMailRu,
-	"inbox.ru": mxevents.VendorURIMailRu,
-	"list.ru":  mxevents.VendorURIMailRu,
-	"bk.ru":    mxevents.VendorURIMailRu,
+	"mail.ru":  mxevents.MailboxVendorURIMailRu,
+	"inbox.ru": mxevents.MailboxVendorURIMailRu,
+	"list.ru":  mxevents.MailboxVendorURIMailRu,
+	"bk.ru":    mxevents.MailboxVendorURIMailRu,
 
 	// ISP example (optional)
-	"comcast.net": mxevents.VendorURIComcast,
+	"comcast.net": mxevents.MailboxVendorURIComcast,
 }

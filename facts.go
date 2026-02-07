@@ -14,13 +14,17 @@ type EventFacts struct {
 }
 
 type SenderFacts struct {
-	Vendor    string
-	EventName string
+	// SourceVendor is the event source vendor/platform (ESP webhook, CRM, etc.).
+	// Examples: mxevents.SourceVendorSendGrid, mxevents.SourceVendorHubSpot.
+	SourceVendor SourceVendor
+	EventName    string
 }
 
 type RecipientFacts struct {
-	VendorURI       string
-	RecipientDomain string
+	// MailboxVendorURI is a mailbox provider behavior bucket identifier.
+	// Values look like domains but are NOT the recipient's domain.
+	MailboxVendorURI MailboxVendorURI
+	RecipientDomain  string
 }
 
 type ClassificationResult struct {

@@ -7,22 +7,22 @@ import (
 	"github.com/commsok/mxevents"
 )
 
-func TestCommonVendorURIEnricher_Enrich(t *testing.T) {
+func TestCommonMailboxVendorURIEnricher_Enrich(t *testing.T) {
 	tests := []struct {
 		name           string
 		facts          *mxevents.EventFacts
-		expectedVendor string
+		expectedVendor mxevents.MailboxVendorURI
 	}{
-		// Code path: VendorURI already set - should skip
+		// Code path: MailboxVendorURI already set - should skip
 		{
-			name: "does not overwrite existing VendorURI",
+			name: "does not overwrite existing MailboxVendorURI",
 			facts: &mxevents.EventFacts{
 				Recipient: mxevents.RecipientFacts{
-					VendorURI:       mxevents.VendorURIOutlook,
-					RecipientDomain: "gmail.com",
+					MailboxVendorURI: mxevents.MailboxVendorURIOutlook,
+					RecipientDomain:  "gmail.com",
 				},
 			},
-			expectedVendor: mxevents.VendorURIOutlook,
+			expectedVendor: mxevents.MailboxVendorURIOutlook,
 		},
 		// Code path: RecipientDomain is empty - should skip
 		{
@@ -34,19 +34,19 @@ func TestCommonVendorURIEnricher_Enrich(t *testing.T) {
 			},
 			expectedVendor: "",
 		},
-		// Code path: Domain found in map - should set VendorURI
+		// Code path: Domain found in map - should set MailboxVendorURI
 		{
-			name: "sets VendorURI for known domain",
+			name: "sets MailboxVendorURI for known domain",
 			facts: &mxevents.EventFacts{
 				Recipient: mxevents.RecipientFacts{
 					RecipientDomain: "gmail.com",
 				},
 			},
-			expectedVendor: mxevents.VendorURIGmail,
+			expectedVendor: mxevents.MailboxVendorURIGmail,
 		},
-		// Code path: Domain not found in map - should not set VendorURI
+		// Code path: Domain not found in map - should not set MailboxVendorURI
 		{
-			name: "does not set VendorURI for unknown domain",
+			name: "does not set MailboxVendorURI for unknown domain",
 			facts: &mxevents.EventFacts{
 				Recipient: mxevents.RecipientFacts{
 					RecipientDomain: "example.com",
@@ -62,13 +62,13 @@ func TestCommonVendorURIEnricher_Enrich(t *testing.T) {
 					RecipientDomain: "Gmail.com",
 				},
 			},
-			expectedVendor: mxevents.VendorURIGmail,
+			expectedVendor: mxevents.MailboxVendorURIGmail,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			enricher := &CommonVendorURIEnricher{}
+			enricher := &CommonMailboxVendorURIEnricher{}
 			ctx := context.Background()
 
 			err := enricher.Enrich(&ctx, tt.facts)
@@ -76,8 +76,8 @@ func TestCommonVendorURIEnricher_Enrich(t *testing.T) {
 				t.Fatalf("Enrich() error = %v", err)
 			}
 
-			if tt.facts.Recipient.VendorURI != tt.expectedVendor {
-				t.Errorf("VendorURI = %q, want %q", tt.facts.Recipient.VendorURI, tt.expectedVendor)
+			if tt.facts.Recipient.MailboxVendorURI != tt.expectedVendor {
+				t.Errorf("MailboxVendorURI = %q, want %q", tt.facts.Recipient.MailboxVendorURI, tt.expectedVendor)
 			}
 		})
 	}

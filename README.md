@@ -28,41 +28,41 @@ Requires Go 1.24 or later.
 package main
 
 import (
-    "context"
-    "fmt"
+	"context"
+	"fmt"
 
-    "github.com/commsok/mxevents"
-    "github.com/commsok/mxevents/toolkit"
+	"github.com/commsok/mxevents"
+	"github.com/commsok/mxevents/toolkit"
 )
 
 func main() {
-    // Create a classifier with default enrichers and classifiers
-    classifier := toolkit.NewDefaultEventClassifier()
+	// Create a classifier with default enrichers and classifiers
+	classifier := toolkit.NewDefaultEventClassifier()
 
-    // Create event facts from your email provider's webhook
-    facts := &mxevents.EventFacts{
-        SMTPResponse:       "550 5.1.1 User unknown",
-        SMTPCode:           "550",
-        SMTPDeliveryStatus: "5.1.1",
-        Sender: mxevents.SenderFacts{
-            Vendor:    "sendgrid",
-            EventName: "bounce",
-        },
-        Recipient: mxevents.RecipientFacts{
-            RecipientDomain: "example.com",
-        },
-    }
+	// Create event facts from your email provider's webhook
+	facts := &mxevents.EventFacts{
+		SMTPResponse:       "550 5.1.1 User unknown",
+		SMTPCode:           "550",
+		SMTPDeliveryStatus: "5.1.1",
+		Sender: mxevents.SenderFacts{
+			SourceVendor: mxevents.SourceVendorSendGrid,
+			EventName:     "bounce",
+		},
+		Recipient: mxevents.RecipientFacts{
+			RecipientDomain: "example.com",
+		},
+	}
 
-    // Classify the event
-    ctx := context.Background()
-    result, err := classifier.Classify(&ctx, facts, 0) // 0 = latest taxonomy version
-    if err != nil {
-        panic(err)
-    }
+	// Classify the event
+	ctx := context.Background()
+	result, err := classifier.Classify(&ctx, facts, 0) // 0 = latest taxonomy version
+	if err != nil {
+		panic(err)
+	}
 
-    fmt.Printf("Event Type: %s\n", result.EventType)
-    fmt.Printf("Reason: %s\n", result.Reason)
-    fmt.Printf("Confidence: %.2f\n", result.Confidence)
+	fmt.Printf("Event Type: %s\n", result.EventType)
+	fmt.Printf("Reason: %s\n", result.Reason)
+	fmt.Printf("Confidence: %.2f\n", result.Confidence)
 }
 ```
 
@@ -139,8 +139,8 @@ Events are organized into five categories representing stages of the email deliv
 
 Enrichers augment `EventFacts` with additional context before classification:
 
-- **SMTPEnricher**: Parses SMTP response codes and delivery status
-- **CommonVendorURIEnricher**: Extracts domain information from vendor URIs
+	- **SMTPEnricher**: Parses SMTP response codes and delivery status
+	- **CommonMailboxVendorURIEnricher**: Infers recipient mailbox vendor buckets from `RecipientDomain`
 
 ### Classifiers
 
