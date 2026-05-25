@@ -124,8 +124,8 @@ func classifyBounceType(sisimaiReason string, isHardBounce bool) mxevents.EventT
 //
 // IMPORTANT: This mapping assumes the mxevents Reason taxonomy includes these additional Reasons:
 // - smtp.ContentError
+// - smtp.RequirePTR
 // - network.Error
-// Optionally, you may also add smtp.RequirePTR; otherwise we map requireptr -> smtp.AuthFailure.
 //
 // If you do not want to add these Reasons, see the comments below for fallback mappings.
 var sisimaiReasonMap = map[string]mxevents.Reason{
@@ -202,9 +202,9 @@ var sisimaiReasonMap = map[string]mxevents.Reason{
 	"securityerror": mxevents.ReasonPolicyBlocked,
 	"suspend":       mxevents.ReasonPolicyBlocked,
 
-	// requireptr is specifically reverse DNS/PTR posture. It is not a generic policy block.
-	// If you add mxevents.ReasonSMTPRequirePTR = "smtp.RequirePTR", map to that instead.
-	"requireptr": mxevents.ReasonSMTPAuthFailure,
+	// requireptr is specifically reverse DNS/PTR posture — distinct from SPF/DKIM/DMARC
+	// auth failures because remediation lives on the connecting MTA's network identity.
+	"requireptr": mxevents.ReasonSMTPRequirePTR,
 
 	// ====================================
 	// System / operational (system.*)

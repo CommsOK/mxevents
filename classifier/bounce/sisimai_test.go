@@ -218,6 +218,7 @@ func TestMapSisimaiReason(t *testing.T) {
 		{"hostunknown", mxevents.ReasonNetworkDnsFailure},
 		{"mailboxfull", mxevents.ReasonSMTPMailboxFull},
 		{"authfailure", mxevents.ReasonSMTPAuthFailure},
+		{"requireptr", mxevents.ReasonSMTPRequirePTR},
 		{"blocked", mxevents.ReasonSMTPBlocked},
 		{"spamdetected", mxevents.ReasonSMTPSpamDetected},
 		{"undefined", mxevents.ReasonUnknown},
