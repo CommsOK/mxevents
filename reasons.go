@@ -161,12 +161,27 @@ const (
 	// ReasonSMTPAuthFailure indicates authentication-related rejection during SMTP evaluation.
 	//
 	// Detectable signals:
-	// - Diagnostics mentioning SPF, DKIM, DMARC, AUTH, rDNS requirements tied to auth posture
+	// - Diagnostics mentioning SPF, DKIM, DMARC, AUTH requirements tied to auth posture
 	//
 	// Reliable inferences:
 	// - May be temporary or permanent
 	// - Sender-side authentication posture problem
 	ReasonSMTPAuthFailure Reason = "smtp.AuthFailure"
+
+	// ReasonSMTPRequirePTR indicates the remote server rejected the connecting host
+	// because its reverse DNS (PTR) posture is missing, mismatched, or otherwise
+	// non-compliant. Operationally distinct from generic SPF/DKIM/DMARC auth failures
+	// — the remediation is on the connecting MTA's network identity, not on the
+	// message or its signing keys.
+	//
+	// Detectable signals:
+	// - Diagnostics like "reverse DNS lookup failed", "no rDNS", "PTR does not match",
+	//   "client hostname does not resolve", commonly with enhanced status 5.7.25.
+	//
+	// Reliable inferences:
+	// - Usually permanent until the sender configures matching PTR records
+	// - Sender-side infrastructure posture problem, not message content
+	ReasonSMTPRequirePTR Reason = "smtp.RequirePTR"
 
 	// ReasonSMTPBlocked indicates the message was blocked/refused/denied by the remote server.
 	//
